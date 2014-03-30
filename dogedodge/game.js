@@ -94,9 +94,13 @@ function o_coin(isDoge, xPos, yPos, ySpeed) {
 /* Draw Coin */
 function drawCoin() {
 
-  for (i=0; i<coins.length; i++) {
+  for (var i=0; i<coins.length; i++) {
 
     it_coin = coins[i];
+
+    console.log("coin nr: " + i);
+    console.log("coin yPos: " + it_coin.yPos);
+
     coin = new Image();
     if (it_coin.isDoge) {
       coin.src = dogcoin_src;
@@ -109,7 +113,7 @@ function drawCoin() {
     }
 
     // Move Coin
-    it_coin.yPos += 10;
+    coins[i].yPos += 10;
 
   }
 
@@ -124,21 +128,22 @@ function mainLoop() {
   //Draw Fox
   drawDogeFig();
 
-  /*Generate Coin
+  //Generate Coin
   var coinSeed = Math.ceil(Math.random()*100);
   if (coinSeed % 3 == 0) {
     var xPos = Math.ceil(Math.random()*(canvas.width-100))
     if (coinSeed % 2 == 0) {
-      coins.push(new Coin(true, 200, 0, 1.2))
+      coins.push(new o_coin(true, xPos, 0, 1.2))
     } else {
-      coins.push(new Coin(false, 200, 0, 1.2))
+      coins.push(new o_coin(false, xPos, 0, 1.2))
     }
-  } */
+  }
 
-  coins.push(new o_coin(true, 200, 0, 2));
 
   //Draw Coins
   drawCoin();
+
+  console.log("coins array size:" + coins.length);
 
 }
 
@@ -148,7 +153,7 @@ function mainLoop() {
 ** which is needed in a standard setInterval(). That means we need to
 ** create a function in setInterval() which then calls the function we actually need
 ***/
-setInterval(function(){mainLoop();},100);
+setInterval(function(){mainLoop();},50);
 keyListener();
 
 
