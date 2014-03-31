@@ -14,6 +14,8 @@ context = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
+//Refresh Time in ms
+refreshTime = 50;
 
 /* Key Listener */
 function keyListener() {
@@ -35,7 +37,7 @@ function keyListener() {
      }
   }
 
-  //KeyPress
+  //KeyRelease
   window.onkeyup = function(e) {
      var key = e.keyCode ? e.keyCode : e.which;
 
@@ -59,13 +61,18 @@ function getTime() {
 }
 
 /* Image Paths */
-dogefig_src = "img/dogefig.jpeg";
+dogerig_src = "img/kabosu/fig_norm_r.png";
+dogelef_src = "img/kabosu/fig_norm_l.png";
+dogemin_src = "img/kabosu/fig_mine.png";
+dogebar_src = "img/kabosu/fig_bark.png";
+
 dogcoin_src = "img/dogecoin.png";
 bitcoin_src = "img/bitcoin.png";
 
 /* Points and Life */
 lives = 10;
 points = 0;
+level = 1;
 
 /* Coin Generator modulo constants CGMC */
 mainCGMC = 50;
@@ -73,11 +80,24 @@ dogeCGMC = 100;
 
 /* Dodge Fox */
 dodgefigX = Math.ceil(canvas.width/2)-42;
+
+//To show spectial faces for kabosu
+//when value is > 0
+//-1 at every loop iteration
+//Colission Face Timer Constant
+//is the value assigne to a picture (bark or mine) when collission occures
+CFTC = (1000/refreshTime)*2
+dogIsMine = 0;
+dogIsBark = 0;
+
 moveRight = false;
 moveLeft = false;
 
 /* Draw Dodge Fox */
 function drawDogeFig() {
+
+  dogefig = new Image();
+  dogefig.src = dogerig_src;
 
   //Check X Movement
   if (moveRight && (dodgefigX < (canvas.width-85))) {
@@ -86,6 +106,7 @@ function drawDogeFig() {
 
   else if (moveLeft && (dodgefigX > 0)) {
     dodgefigX -= 15;
+    dogefig.src = dogelef_src;
   }
 
   //If fox is out of the window (right) in cas window was resized
@@ -93,8 +114,12 @@ function drawDogeFig() {
     dodgefigX = canvas.width-85;
   }
 
-  dogefig = new Image();
-  dogefig.src = dogefig_src;
+  if (--dogIsMine > 0) {
+    dogefig.src = dogemin_src;
+  } else if (--dogIsBark > 0) {
+    dogefig.src = dogebar_src;
+  }
+
   dogefig.onload = function() {
         context.drawImage(dogefig, dodgefigX, 200);
   }
@@ -109,7 +134,7 @@ function o_coin(img, isDoge, xPos, yPos, ySpeed) {
   this.isDoge = isDoge;
   this.xPos = xPos;
   this.yPos = yPos;
-  this.ySpeed = ySpeed;
+  this.ySpeed = ySpeed; //NOT USED RIGHT NOW
 }
 
 /* Draw Coin */
@@ -132,7 +157,6 @@ function drawCoin() {
       // Move Coin
       coins[i].yPos += 5;
     }
-
 
   }
 
@@ -159,10 +183,14 @@ function detectCol(col_coin) {
     col_coin.isActive = false;
     if (isDoge) {
       points += 100;
-    }
-
-    else {
-      lives -= 1;
+      dogIsMine = CFTC;
+      dogIsBark = 0;
+    } else {
+      dogIsMine = 0;
+      dogIsBark = CFTC;
+      if (--lives == 0) {
+        clearInterval(mainIV);
+      }
     }
   }
 
@@ -172,10 +200,11 @@ function detectCol(col_coin) {
 function drawStats() {
 
   context.fillStyle = "#2222FF";
-  context.font = "bold 30px sans-serif";
-  context.fillText(points, canvas.width-100, canvas.height-100);
-  context.fillText(lives, canvas.width-100, canvas.height-150);
-  context.fillText(getTime(), canvas.width-100, canvas.height-200);
+  context.font = "bold 20px sans-serif";
+  context.fillText("POINTS " + points, canvas.width-250, canvas.height-50);
+  context.fillText("LIVES " + lives, canvas.width-250, canvas.height-100);
+  context.fillText("SECONDS " + getTime(), canvas.width-250, canvas.height-150);
+  context.fillText("LEVEL " + level, canvas.width-250, canvas.height-200);
 
 }
 
@@ -185,14 +214,9 @@ function mainLoop() {
   //Clear Canvas + Window is now resizable
   canvas.width = window.innerWidth;
 
-  //Draw Fox
-  drawDogeFig();
-
-  //Draw Coins
-  drawCoin();
-
-  //DrawPoints and Lives
   drawStats();
+  drawDogeFig();
+  drawCoin();
 
   //Generate Coin
   var coinSeed = Math.ceil(Math.random()*500);
@@ -216,13 +240,37 @@ function mainLoop() {
     console.log("coins array size:" + coins.length);
   }
 
+  // Regulate CGMC
+  // coin quantity grows with time
+  if (mainCGMC == 50 && getTime() == 20) {
+    mainCGMC = 25;
+    dogeCGMC = 50;
+    level++;
+  }
+
+  else if (mainCGMC == 25 && getTime() == 50) {
+    mainCGMC = 20;
+    dogeCGMC = 60;
+    level++;
+  }
+
+  else if (mainCGMC == 20 && getTime() == 100) {
+    mainCGMC = 10;
+    level++;
+  }
+
+  else if (mainCGMC == 10 && getTime() == 150) {
+    //TODO: change speed
+    level++;
+  }
+
 }
 
 /*** Chrome doesn't support converting a String into code
 ** which is needed in a standard setInterval(). That means we need to
 ** create a function in setInterval() which then calls the function we actually need
 ***/
-setInterval(function(){mainLoop();},50);
+mainIV = setInterval(function(){mainLoop();},refreshTime);
 keyListener();
 
 
