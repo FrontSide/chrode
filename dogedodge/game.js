@@ -15,7 +15,7 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 //Refresh Time in ms
-refreshTime = 50;
+refreshTime = 30;
 
 /* Key Listener */
 function keyListener() {
@@ -60,19 +60,53 @@ function getTime() {
   return Math.floor((new Date().getTime())/1000) - startsec;
 }
 
-/* Image Paths */
-dogerig_src = "img/kabosu/fig_norm_r.png";
-dogelef_src = "img/kabosu/fig_norm_l.png";
-dogemin_src = "img/kabosu/fig_mine.png";
-dogebar_src = "img/kabosu/fig_bark.png";
 
-dogcoin_src = "img/dogecoin.png";
-bitcoin_src = "img/bitcoin.png";
+/* Preloaded Pictres */
+function preloadPics() {
+
+  context.fillStyle = "#2222FF";
+  context.font = "bold 40px sans-serif";
+  context.fillText("LOADING ... ", Math.floor(canvas.width/2)-100, 200);
+
+  i_doge_rig = new Image();
+  i_doge_rig.addEventListener('load', incr_loaded_pics , false);
+  i_doge_rig.src = "img/kabosu/fig_norm_r.png";
+
+  i_doge_lef = new Image();
+  i_doge_lef.addEventListener('load', incr_loaded_pics , false);
+  i_doge_lef.src = "img/kabosu/fig_norm_l.png";
+
+  i_doge_mine = new Image();
+  i_doge_mine.addEventListener('load', incr_loaded_pics , false);
+  i_doge_mine.src = "img/kabosu/fig_mine.png";
+
+  i_doge_bark = new Image();
+  i_doge_bark.addEventListener('load', incr_loaded_pics , false);
+  i_doge_bark.src = "img/kabosu/fig_bark.png";
+
+  i_coin_doge = new Image();
+  i_coin_doge.addEventListener('load', incr_loaded_pics , false);
+  i_coin_doge.src = "img/dogecoin.png";
+
+  i_coin_bit = new Image();
+  i_coin_bit.addEventListener('load', incr_loaded_pics , false);
+  i_coin_bit.src = "img/bitcoin.png";
+}
+
+nr_pics = 6;
+loaded_pics = 0;
+
+function incr_loaded_pics() {
+  if (++loaded_pics == nr_pics) {
+    requestAnimationFrame(mainLoop);
+  }
+}
 
 /* Points and Life */
 lives = 10;
 points = 0;
 level = 1;
+isGameOver = false;
 
 /* Coin Generator modulo constants CGMC */
 mainCGMC = 50;
@@ -93,11 +127,11 @@ dogIsBark = 0;
 moveRight = false;
 moveLeft = false;
 
+
 /* Draw Dodge Fox */
 function drawDogeFig() {
 
-  dogefig = new Image();
-  dogefig.src = dogerig_src;
+  var img = i_doge_rig;
 
   //Check X Movement
   if (moveRight && (dodgefigX < (canvas.width-85))) {
@@ -106,7 +140,7 @@ function drawDogeFig() {
 
   else if (moveLeft && (dodgefigX > 0)) {
     dodgefigX -= 15;
-    dogefig.src = dogelef_src;
+    img = i_doge_lef;
   }
 
   //If fox is out of the window (right) in cas window was resized
@@ -115,14 +149,12 @@ function drawDogeFig() {
   }
 
   if (--dogIsMine > 0) {
-    dogefig.src = dogemin_src;
+    img = i_doge_mine;
   } else if (--dogIsBark > 0) {
-    dogefig.src = dogebar_src;
+    img = i_doge_bark;
   }
 
-  dogefig.onload = function() {
-        context.drawImage(dogefig, dodgefigX, 200);
-  }
+  context.drawImage(img, dodgefigX, 200);
 
 }
 
@@ -189,7 +221,7 @@ function detectCol(col_coin) {
       dogIsMine = 0;
       dogIsBark = CFTC;
       if (--lives == 0) {
-        clearInterval(mainIV);
+        gameOver();
       }
     }
   }
@@ -205,6 +237,17 @@ function drawStats() {
   context.fillText("LIVES " + lives, canvas.width-250, canvas.height-100);
   context.fillText("SECONDS " + getTime(), canvas.width-250, canvas.height-150);
   context.fillText("LEVEL " + level, canvas.width-250, canvas.height-200);
+
+}
+
+/* Set Game Over */
+function gameOver() {
+
+  isGameOver = true;
+
+  context.fillStyle = "#2222FF";
+  context.font = "bold 40px sans-serif";
+  context.fillText("GAME OVER", Math.floor(canvas.width/2)-100, 200);
 
 }
 
@@ -224,17 +267,14 @@ function mainLoop() {
 
   if (coinSeed % mainCGMC == 0) {
 
-    var img = new Image();
     var xPos = Math.ceil(Math.random()*(canvas.width-100))
 
     if (coinSeed % dogeCGMC == 0) {
-      img.src = dogcoin_src;
-      coins.push(new o_coin(img, true, xPos, 0, 1.2))
+      coins.push(new o_coin(i_coin_doge, true, xPos, 0, 1.2))
     }
 
     else {
-      img.src = bitcoin_src;
-      coins.push(new o_coin(img, false, xPos, 0, 1.2))
+      coins.push(new o_coin(i_coin_bit, false, xPos, 0, 1.2))
     }
 
     console.log("coins array size:" + coins.length);
@@ -264,13 +304,20 @@ function mainLoop() {
     level++;
   }
 
+  if (!isGameOver) {
+    requestAnimationFrame(mainLoop);
+  }
+
 }
 
-/*** Chrome doesn't support converting a String into code
-** which is needed in a standard setInterval(). That means we need to
-** create a function in setInterval() which then calls the function we actually need
-***/
-mainIV = setInterval(function(){mainLoop();},refreshTime);
+//Request Animation Frame
+window.requestAnimationFrame = window.requestAnimationFrame ||
+                               window.mozRequestAnimationFrame ||
+                               window.webkitRequestAnimationFrame ||
+                               window.msRequestAnimationFrame;
+
+mainIV = false;
+preloadPics();
 keyListener();
 
 
