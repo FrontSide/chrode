@@ -69,27 +69,27 @@ function preloadPics() {
   context.fillText("LOADING ... ", Math.floor(canvas.width/2)-100, 200);
 
   i_doge_rig = new Image();
-  i_doge_rig.addEventListener('load', incr_loaded_pics , false);
+  i_doge_rig.onload = function() { incr_loaded_pics(); };
   i_doge_rig.src = "img/kabosu/fig_norm_r.png";
 
   i_doge_lef = new Image();
-  i_doge_lef.addEventListener('load', incr_loaded_pics , false);
+  i_doge_lef.onload = function() { incr_loaded_pics(); };
   i_doge_lef.src = "img/kabosu/fig_norm_l.png";
 
   i_doge_mine = new Image();
-  i_doge_mine.addEventListener('load', incr_loaded_pics , false);
+  i_doge_mine.onload = function() { incr_loaded_pics(); };
   i_doge_mine.src = "img/kabosu/fig_mine.png";
 
   i_doge_bark = new Image();
-  i_doge_bark.addEventListener('load', incr_loaded_pics , false);
+  i_doge_bark.onload = function() { incr_loaded_pics(); };
   i_doge_bark.src = "img/kabosu/fig_bark.png";
 
   i_coin_doge = new Image();
-  i_coin_doge.addEventListener('load', incr_loaded_pics , false);
+  i_coin_doge.onload = function() { incr_loaded_pics(); };
   i_coin_doge.src = "img/dogecoin.png";
 
   i_coin_bit = new Image();
-  i_coin_bit.addEventListener('load', incr_loaded_pics , false);
+  i_coin_bit.onload = function() { incr_loaded_pics(); };
   i_coin_bit.src = "img/bitcoin.png";
 }
 
@@ -253,6 +253,13 @@ function gameOver() {
 
 /* Draw Loop - Main */
 function mainLoop() {
+
+
+  /***
+  *
+  * TODO: BUFFER AGAINST FLICKERING
+  *
+  ***/
 
   //Clear Canvas + Window is now resizable
   canvas.width = window.innerWidth;
