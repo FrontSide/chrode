@@ -9,4 +9,4 @@ and sharen your knowledge.
 Dogedodge
 =========
 
-!(Dodge the Bit and hit the Doge)(http://i.imgur.com/sNZJQ8j.png)
+![Dodge the Bit and hit the Doge](http://i.imgur.com/sNZJQ8j.png)
