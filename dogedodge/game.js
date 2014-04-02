@@ -31,9 +31,11 @@ function keyListener() {
      if (key == 39) {
          moveLeft = false;
          moveRight = true;
-     }else if (key == 37) {
+     } else if (key == 37) {
          moveLeft = true;
          moveRight = false;
+     } else if (key == 13 && isGameOver) { //ReturnKey for restart at game Over
+         restartGame();
      }
   }
 
@@ -60,6 +62,16 @@ function getTime() {
   return Math.floor((new Date().getTime())/1000) - startsec;
 }
 
+/* Restart the game when user presses Return after Game Over */
+function restartGame() {
+
+  //reset all values
+  resetGamePlayValues();
+
+  //preload is not actually necessary here but it makes things easier
+  preloadPics();
+
+}
 
 /* Preloaded Pictres */
 function preloadPics() {
@@ -93,8 +105,8 @@ function preloadPics() {
   i_coin_bit.src = "img/bitcoin.png";
 }
 
-nr_pics = 6;
-loaded_pics = 0;
+var nr_pics;
+var loaded_pics;
 
 function incr_loaded_pics() {
   if (++loaded_pics == nr_pics) {
@@ -103,30 +115,50 @@ function incr_loaded_pics() {
 }
 
 /* Points and Life */
-lives = 10;
-points = 0;
-level = 1;
-isGameOver = false;
+var lives;
+var points;
+var level;
+var isGameOver;
 
 /* Coin Generator modulo constants CGMC */
-mainCGMC = 50;
-dogeCGMC = 100;
+var mainCGMC;
+var dogeCGMC;
 
 /* Dodge Fox */
-dodgefigX = Math.ceil(canvas.width/2)-42;
+var dodgefigX;
+var dodgefigY;
+
 
 //To show spectial faces for kabosu
 //when value is > 0
 //-1 at every loop iteration
 //Colission Face Timer Constant
 //is the value assigne to a picture (bark or mine) when collission occures
-CFTC = (1000/refreshTime)*2
-dogIsMine = 0;
-dogIsBark = 0;
+var CFTC;
+var dogIsMine;
+var dogIsBark;
 
-moveRight = false;
-moveLeft = false;
+var moveRight;
+var moveLeft;
 
+/* Default reset Values */
+function resetGamePlayValues() {
+  nr_pics = 6;
+  loaded_pics = 0;
+  lives = 10;
+  points = 0;
+  level = 1;
+  isGameOver = false;
+  mainCGMC = 50;
+  dogeCGMC = 100;
+  dodgefigX = Math.ceil(canvas.width/2)-42;
+  dodgefigY = 200;
+  CFTC = (1000/refreshTime)*2
+  dogIsMine = 0;
+  dogIsBark = 0;
+  moveRight = false;
+  moveLeft = false;
+}
 
 /* Draw Dodge Fox */
 function drawDogeFig() {
@@ -154,7 +186,7 @@ function drawDogeFig() {
     img = i_doge_bark;
   }
 
-  context.drawImage(img, dodgefigX, 200);
+  context.drawImage(img, dodgefigX, dodgefigY);
 
 }
 
@@ -207,7 +239,7 @@ function detectCol(col_coin) {
   var isDoge = col_coin.isDoge;
   var col = false;
 
-  if (((x+w) >= dodgefigX) && (x <= (dodgefigX+85)) && ((y+h) >= 200) && (y < 285)) {
+  if (((x+w) >= dodgefigX) && (x <= (dodgefigX+85)) && ((y+h) >= dodgefigY) && (y < (dodgefigY + 85))) {
     col = true;
   }
 
@@ -248,6 +280,37 @@ function gameOver() {
   context.fillStyle = "#2222FF";
   context.font = "bold 40px sans-serif";
   context.fillText("GAME OVER", Math.floor(canvas.width/2)-100, 200);
+  context.font = "bold 25px serif";
+  context.fillStyle = "#22FF22"
+  context.fillText("press ENTER to RESTART", Math.floor(canvas.width/2)-100, 250)
+
+}
+
+/* Draw Prompts for collissions
+   Text grows bigger due to resize factor calculated out of CFTC
+   and dogIsMine/Bark value
+ */
+function drawPrompt() {
+
+  context.fillStyle = "#FF2222";
+  context.rotate(0.2);
+  var size = 0;
+
+  if (dogIsMine > 0) {
+
+    size = 20 + (dogIsMine*(-1)+CFTC);
+    context.font = "bold " + size + "px serif";
+    context.fillText("wow", dodgefigX, dodgefigY);
+
+  } else if (dogIsBark > 0) {
+
+    size = 20 + (dogIsBark*(-1)+CFTC);
+    context.font = "bold " + size + "px serif";
+    context.fillText("ouch!!!", dodgefigX, dodgefigY);
+
+  }
+
+  context.rotate(-0.2);
 
 }
 
@@ -265,6 +328,7 @@ function mainLoop() {
   canvas.width = window.innerWidth;
 
   drawStats();
+  drawPrompt();
   drawDogeFig();
   drawCoin();
 
@@ -323,8 +387,7 @@ window.requestAnimationFrame = window.requestAnimationFrame ||
                                window.webkitRequestAnimationFrame ||
                                window.msRequestAnimationFrame;
 
-mainIV = false;
-preloadPics();
+restartGame();
 keyListener();
 
 
