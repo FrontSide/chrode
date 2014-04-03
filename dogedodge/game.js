@@ -5,6 +5,10 @@
  * This project is open-source
  * fork me on https://github.com/FrontSide/chrode
  * wow
+ *
+ * Fork for Rich Internet Applications Course
+ * Exercise 4
+ *
  */
 
 
