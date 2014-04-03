@@ -22,6 +22,23 @@ body {
 	color:#222;
 }
 
+#statsbox {
+	background-color:#DDD;
+	border:#55F 2px solid;
+	position:fixed;
+	width:200px;
+	height:300px;
+	padding:20px;
+	right:20px;
+	bottom:20px;
+	font-family: Arial;
+	font-size:20px;
+	font-weight:bold;
+	visibility:visible;
+	color:#222;
+	line-height: 0.7em;
+}
+
 #move_instr {
 	width:100%;
 }

@@ -60,6 +60,7 @@ function getTime() {
 /* Restart the game when user presses Return after Game Over */
 function restartGame() {
 
+	statsbox.style.visibility = "visible";
 	showMessage(false);
   	resetGamePlayValues();
   	preloadPics();
@@ -113,16 +114,14 @@ var points;
 var level;
 var isGameOver;
 var messageToShow;
-var messageBox = document.getElementById("messagebox");
 
 // Default Messaged
 var welcomeMsg = "WELCOME TO le DOGEDODGE <br /> " +
 				"<img id='move_instr' src='img/move_instr.png' /><br />" +
 				"Hit RETURN to mine!";
 
-var gameOverMsg;
-function setGameOverMsg() {
-	gameOverMsg = "le GAME  is OVER <br /><h3><br /> you mined " +
+function getGameOverMsg() {
+	return "le GAME  is OVER <br /><h3><br /> you mined " +
 				points + " doges! <br /> in very " +
 				getTime() + " seconds! <br /> such wow!<br /><br /></h3>" +
 				"Hit RETURN to mine on!" ;
@@ -178,7 +177,18 @@ function showMessage(show) {
 	if (!show) {
 		messagebox.style.visibility = "hidden";
 	}
+}
 
+/* Prints the Stats in the right bottom corner */
+function showStats(show) {
+	statsbox.innerHTML =
+		"MINED COINS <h3>" + points +
+		"</h3><br /> TIME <h3>" + getTime() +
+		"</h3><br /> LEVEL <h3>" + level +
+		"</h3><br /> LIVES <h3>" + lives + "</h3>";
+	if (!show) {
+		statsbox.style.visibility = "hidden";
+	}
 }
 
 /* Draw Dodge Fox */
@@ -270,32 +280,20 @@ function detectCol(col_coin) {
   	if (col) {
 		col_coin.isActive = false;
 		if (isDoge) {
-      		points += 100;
+      		points++;
       		dogIsMine = CFTC;
       		dogIsBark = 0;
     	} else {
       		dogIsMine = 0;
       		dogIsBark = CFTC;
       			if (--lives == 0) {
-					setGameOverMsg();
-					messageToShow = gameOverMsg;
+					messageToShow = getGameOverMsg();
+					showStats(false);
 					showMessage(true);
         			isGameOver = true;
       			}
 		}
 	}
-
-}
-
-/* Draw Stats */
-function drawStats() {
-
-	context.fillStyle = "#2222FF";
-  	context.font = "bold 20px sans-serif";
-  	context.fillText("POINTS " + points, canvas.width-250, canvas.height-50);
-  	context.fillText("LIVES " + lives, canvas.width-250, canvas.height-100);
-  	context.fillText("SECONDS " + getTime(), canvas.width-250, canvas.height-150);
-  	context.fillText("LEVEL " + level, canvas.width-250, canvas.height-200);
 
 }
 
@@ -340,7 +338,7 @@ function mainLoop() {
   	//Clear Canvas + Window is now resizable
   	canvas.width = window.innerWidth;
 
-  	drawStats();
+  	showStats(true);
   	drawPrompt();
   	drawDogeFig();
   	drawCoin();
@@ -403,6 +401,7 @@ window.requestAnimationFrame = window.requestAnimationFrame ||
 
 messageToShow = welcomeMsg;
 showMessage(true);
+showStats(false);
 keyListener();
 
 
