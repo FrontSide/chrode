@@ -36,7 +36,7 @@ function keyListener() {
 		 } else if (key == 37) {
 			 moveLeft = true;
 			 moveRight = false;
-		 } else if (key == 13 && isGameOver) { //ReturnKey for restart at game Over
+		 } else if (key == 13 && messageToShow) { //ReturnKey for restart at game Over
 			 restartGame();
 		 }
 	}
@@ -44,9 +44,6 @@ function keyListener() {
   	//KeyRelease
 	window.onkeyup = function(e) {
 		var key = e.keyCode ? e.keyCode : e.which;
-
-	  	// Cursor Right -> 39
-	  	// Cursor Left  -> 37
 
 	  	//Activate Movement if key is pressed
 	  	if (key == 39) {
@@ -66,7 +63,6 @@ function getTime() {
 /* Restart the game when user presses Return after Game Over */
 function restartGame() {
 
-	showWelcomeMessage();
   	resetGamePlayValues();
   	preloadPics();
 
@@ -118,6 +114,11 @@ var lives;
 var points;
 var level;
 var isGameOver;
+var messageToShow;
+
+// Default Messaged
+welcomeMsg = "WELCOME TO DOGEDODGE";
+gameOverMsg = "GAME OVER";
 
 /* Coin Generator modulo constants CGMC */
 var mainCGMC;
@@ -157,11 +158,22 @@ function resetGamePlayValues() {
   	dogIsBark = 0;
   	moveRight = false;
   	moveLeft = false;
+	messageToShow = false;
 }
 
-function showWelcomeMessage() {
+/* Prints a message in a box in the center of the screen */
+function showMessage() {
+
+	var boxX = (canvas.width/2)-100;
+	var boxY = 200;
 
 	context.fillStyle = #222222;
+	context.fillRect(boxX, boxY, 300, 200);
+
+	context.fillStyle = #DDDDDD;
+	context.font = "bold 20px sans-serif";
+
+  	context.fillText(messageToShow, boxX+20, boxY+10);
 
 }
 
@@ -261,7 +273,8 @@ function detectCol(col_coin) {
       		dogIsMine = 0;
       		dogIsBark = CFTC;
       			if (--lives == 0) {
-        			gameOver();
+					messageToShow = gameOverMsg;
+        			isGameOver = true;
       			}
 		}
 	}
@@ -277,20 +290,6 @@ function drawStats() {
   	context.fillText("LIVES " + lives, canvas.width-250, canvas.height-100);
   	context.fillText("SECONDS " + getTime(), canvas.width-250, canvas.height-150);
   	context.fillText("LEVEL " + level, canvas.width-250, canvas.height-200);
-
-}
-
-/* Set Game Over */
-function gameOver() {
-
-  	isGameOver = true;
-
-  	context.fillStyle = "#2222FF";
-  	context.font = "bold 40px sans-serif";
-  	context.fillText("GAME OVER", Math.floor(canvas.width/2)-100, 200);
-  	context.font = "bold 25px serif";
-  	context.fillStyle = "#22FF22"
-  	context.fillText("press ENTER to RESTART", Math.floor(canvas.width/2)-100, 250)
 
 }
 
@@ -395,7 +394,9 @@ window.requestAnimationFrame = window.requestAnimationFrame ||
                                window.webkitRequestAnimationFrame ||
                                window.msRequestAnimationFrame;
 
-restartGame();
+
+messageToShow = welcomeMsg;
+showMessage();
 keyListener();
 
 
