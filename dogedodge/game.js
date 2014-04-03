@@ -19,9 +19,6 @@ context = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-// Time in ms
-Time = 30;
-
 /* Key Listener */
 function keyListener() {
 
@@ -36,7 +33,7 @@ function keyListener() {
 		 } else if (key == 37) {
 			 moveLeft = true;
 			 moveRight = false;
-		 } else if (key == 13 && messageToShow) { //ReturnKey for restart at game Over
+		 } else if (key == 13 && messageToShow != false) { //ReturnKey for restart at game Over
 			 restartGame();
 		 }
 	}
@@ -55,7 +52,7 @@ function keyListener() {
 }
 
 /* Played Seconds */
-startsec = Math.floor((new Date().getTime())/1000);
+var startsec; //Time at start in seconds
 function getTime() {
   	return Math.floor((new Date().getTime())/1000) - startsec;
 }
@@ -63,6 +60,7 @@ function getTime() {
 /* Restart the game when user presses Return after Game Over */
 function restartGame() {
 
+	showMessage(false);
   	resetGamePlayValues();
   	preloadPics();
 
@@ -115,10 +113,20 @@ var points;
 var level;
 var isGameOver;
 var messageToShow;
+var messageBox = document.getElementById("messagebox");
 
 // Default Messaged
-welcomeMsg = "WELCOME TO DOGEDODGE";
-gameOverMsg = "GAME OVER";
+var welcomeMsg = "WELCOME TO le DOGEDODGE <br /> " +
+				"<img id='move_instr' src='img/move_instr.png' /><br />" +
+				"Hit RETURN to mine!";
+
+var gameOverMsg;
+function setGameOverMsg() {
+	gameOverMsg = "le GAME  is OVER <br /><h3><br /> you mined " +
+				points + " doges! <br /> in very " +
+				getTime() + " seconds! <br /> such wow!<br /><br /></h3>" +
+				"Hit RETURN to mine on!" ;
+}
 
 /* Coin Generator modulo constants CGMC */
 var mainCGMC;
@@ -153,27 +161,23 @@ function resetGamePlayValues() {
   	dogeCGMC = 100;
   	dodgefigX = Math.ceil(canvas.width/2)-42;
   	dodgefigY = 200;
-  	CFTC = (1000/Time)*2
+  	CFTC = (1000/30)*2 //-> ca. 2 seconds
   	dogIsMine = 0;
   	dogIsBark = 0;
   	moveRight = false;
   	moveLeft = false;
 	messageToShow = false;
+	startsec = Math.floor((new Date().getTime())/1000);
 }
 
 /* Prints a message in a box in the center of the screen */
-function showMessage() {
+function showMessage(show) {
 
-	var boxX = (canvas.width/2)-100;
-	var boxY = 200;
-
-	context.fillStyle = #222222;
-	context.fillRect(boxX, boxY, 300, 200);
-
-	context.fillStyle = #DDDDDD;
-	context.font = "bold 20px sans-serif";
-
-  	context.fillText(messageToShow, boxX+20, boxY+10);
+	messagebox.style.visibility = "visible";
+	messagebox.innerHTML = messageToShow;
+	if (!show) {
+		messagebox.style.visibility = "hidden";
+	}
 
 }
 
@@ -273,7 +277,9 @@ function detectCol(col_coin) {
       		dogIsMine = 0;
       		dogIsBark = CFTC;
       			if (--lives == 0) {
+					setGameOverMsg();
 					messageToShow = gameOverMsg;
+					showMessage(true);
         			isGameOver = true;
       			}
 		}
@@ -396,7 +402,7 @@ window.requestAnimationFrame = window.requestAnimationFrame ||
 
 
 messageToShow = welcomeMsg;
-showMessage();
+showMessage(true);
 keyListener();
 
 

@@ -1,7 +1,32 @@
 body {
-  background-color:#DDD;
+  	background-color:#DDD;
 }
 
 #maincanvas {
-  background-color:#D55;
+  	background-color:#D55;
+}
+
+#messagebox {
+	background-color:#DDD;
+	border:#55F 3px solid;
+	position:fixed;
+	top:20%;
+	min-width:360px;
+	width:35%;
+	padding:20px;
+	left:25%;
+	font-family: Arial;
+	font-size:30px;
+	font-weight:bold;
+	visibility:hidden;
+	color:#222;
+}
+
+#move_instr {
+	width:100%;
+}
+
+h3 {
+	color: #FF2222;
+	font-size: 20px;
 }
