@@ -27,15 +27,25 @@ function keyListener() {
      	var key = e.keyCode ? e.keyCode : e.which;
 
      	//Activate Movement if key is pressed
-		 if (key == 39) {
-			 moveLeft = false;
-			 moveRight = true;
-		 } else if (key == 37) {
-			 moveLeft = true;
-			 moveRight = false;
-		 } else if (key == 13 && messageToShow != false) { //ReturnKey for restart at game Over
-			 restartGame();
-		 }
+		if (key == 39) {
+			moveLeft = false;
+			moveRight = true;
+		} else if (key == 37) {
+			moveLeft = true;
+			moveRight = false;
+		}
+
+		if (key == 38) {
+		 	moveUp = true;
+			moveDown = false;
+		} else if (key == 40) {
+		 	moveDown = true;
+			moveUp = false;
+		}
+
+		if (key == 13 && messageToShow != false) { //ReturnKey for restart at game Over
+			restartGame();
+		}
 	}
 
   	//KeyRelease
@@ -47,7 +57,13 @@ function keyListener() {
 		  	moveRight = false;
 	  	} else if (key == 37) {
 		  	moveLeft = false;
-	  	}
+		}
+
+		if (key == 38) {
+		 	moveUp = false;
+		} else if (key == 40) {
+		 	moveDown = false;
+		}
   	}
 }
 
@@ -135,7 +151,6 @@ var dogeCGMC;
 var dodgefigX;
 var dodgefigY;
 
-
 //To show spectial faces for kabosu
 //when value is > 0
 //-1 at every loop iteration
@@ -147,6 +162,8 @@ var dogIsBark;
 
 var moveRight;
 var moveLeft;
+var moveUp;
+var moveDown;
 
 /* Default reset Values */
 function resetGamePlayValues() {
@@ -165,6 +182,8 @@ function resetGamePlayValues() {
   	dogIsBark = 0;
   	moveRight = false;
   	moveLeft = false;
+	moveUp = false;
+	moveDown = false;
 	messageToShow = false;
 	startsec = Math.floor((new Date().getTime())/1000);
 }
@@ -206,10 +225,23 @@ function drawDogeFig() {
     	img = i_doge_lef;
   	}
 
-  	//If fox is out of the window (right) in cas window was resized
+	//Check Y Movement
+	if (moveUp && (dodgefigY > 0)) {
+		dodgefigY -= 15;
+	}
+
+	else if (moveDown && (dodgefigY < (canvas.height-85))) {
+		dodgefigY += 15;
+	}
+
+  	//If fox is out of the window (right, bottom) in cas window was resized
   	if (dodgefigX > (canvas.width-85)) {
     	dodgefigX = canvas.width-85;
   	}
+
+	if (dodgefigY > (canvas.height-85)) {
+		dodgefigY = canvas.height-85;
+	}
 
   	if (--dogIsMine > 0) {
     	img = i_doge_mine;
